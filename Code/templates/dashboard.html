@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ArtCollective</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-info p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .user-info a {
+            color: #fff;
+            text-decoration: none;
+            background-color: #ff4d4d;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .menu-bar {
+            background-color: #444;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .menu-bar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+        }
+        .menu-bar a:hover {
+            color: #007bff;
+        }
+        .dashboard-actions {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .dashboard-actions button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        .dashboard-actions button:hover {
+            background-color: #0056b3;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+        }
+        .gallery-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin: 10px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex: 1 1 calc(25% - 20px);
+            max-width: calc(25% - 20px);
+            position: relative;
+        }
+        .gallery-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .gallery-item h3 {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .gallery-item p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .gallery-item .chat-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .banner {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .banner p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .flash-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: fadeOut 5s forwards;
+        }
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .chat-box {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        .chat-header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .chat-body {
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .chat-options {
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .chat-options button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chat-options button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo ArtCollective">
+            <h1>ARTCOLLECTIVE</h1>
+        </div>
+        <div class="user-info">
+            <p>Bienvenido, <strong>{{ Nombre }}</strong>({{ Correo }})</p>
+            <a href="/logout">Cerrar sesión</a>
+        </div>
+    </header>
+
+    <div class="menu-bar">
+        <a href="/dashboard">Paints</a>
+        <a href="/dashboard">Instagram</a>
+        <a href="#banner">About</a>
+        <a href="#banner">Contact</a>
+        <a href="/dashboard">Shop</a>
+    </div>
+
+    <div class="dashboard-actions">
+        <button>Publicar obra</button>
+        <button onclick="window.location.href='/comprar'">Comprar</button>
+    </div>
+
+    <main>
+        <section class="gallery">
+            <div class="gallery-item">
+                <img src="{{ url_for('static', filename='img/perro_guaton.jpg') }}" alt="Perro Guaton">
+                <h3>Perro Guaton</h3>
+                <p>1,000,000</p>
+                <button class="chat-button" onclick="mostrarChat('Perro Guaton', '1,000,000')">💬</button>
+            </div>
+            <div class="gallery-item">
+                <img src="{{ url_for('static', filename='img/descargar.jpg') }}" alt="Tocando el violin">
+                <h3>Tocando el violin</h3>
+                <p>2,500,000</p>
+                <button class="chat-button" onclick="mostrarChat('Tocando el violin', '2,500,000')">💬</button>
+            </div>
+            <div class="gallery-item">
+                <img src="{{ url_for('static', filename='img/https___pin_it_2Dhb4E0B5.jpg') }}" alt="Take the Ocean Home">
+                <h3>Take the Ocean Home</h3>
+                <p>1 peso</p>
+                <button class="chat-button" onclick="mostrarChat('Take the Ocean Home', '1 peso')">💬</button>
+            </div>
+            <div class="gallery-item">
+                <img src="{{ url_for('static', filename='img/descargar (4).jpg') }}" alt="PETJACK">
+                <h3>PETJACK</h3>
+                <p>14,000</p>
+                <button class="chat-button" onclick="mostrarChat('PETJACK', '14,000')">💬</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="banner" class="banner">
+        <p>contacto@artcollective.com</p>
+        <p>ArtCollective - Creado por Jose Javier Mejorada Soto</p>
+        <p>Proyecto de Hybridge</p>
+    </div>
+
+    <!-- Chat en la parte inferior derecha -->
+    <div id="chat-box" class="chat-box">
+        <div class="chat-header">
+            <h3>Chat con el vendedor</h3>
+            <button onclick="cerrarChat()">✖️</button>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <!-- Mensajes del chat -->
+        </div>
+        <div class="chat-options">
+            <button onclick="enviarMensaje('Precio')">Precio</button>
+            <button onclick="enviarMensaje('Más detalles')">Más detalles</button>
+        </div>
+    </div>
+
+    <!-- Script para manejar el chat -->
+    <script>
+        function mostrarChat(nombrePintura, precio) {
+            const chatBox = document.getElementById('chat-box');
+            const chatBody = document.getElementById('chat-body');
+            chatBody.innerHTML = `<p>Hola {{ Nombre }}, vimos que te interesa nuestra pintura "${nombrePintura}". ¿En qué podemos ayudarte?</p>`;
+            chatBox.style.display = 'block';
+        }
+
+        function cerrarChat() {
+            document.getElementById('chat-box').style.display = 'none';
+        }
+
+        function enviarMensaje(opcion) {
+            const chatBody = document.getElementById('chat-body');
+            if (opcion === 'Precio') {
+                chatBody.innerHTML += `<p>Claro {{ Nombre }}! El precio de esta pintura es ${precio}.</p>`;
+            } else if (opcion === 'Más detalles') {
+                chatBody.innerHTML += `<p>Claro {{ Nombre }}! Te enviaremos más detalles por correo.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
